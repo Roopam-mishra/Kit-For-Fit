@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Kit For Fit</string>
+    <string name="intro_text">Hi! Read data to get your steps count.</string>
+    <string name="action_settings">Settings</string>
+    <string name="settings">Settings</string>
+    <string name="ok">OK</string>
+    <string name="permission_rationale">Location data is used as part of the Google Fit API</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core
+        functionality.</string>
+    <string name="read_step_data">Read step data</string>
+    <string name="type_activity_segment">TYPE_ACTIVITY_SEGMENT = ?</string>
+    <string name="type_basal_metabolic_rate">TYPE_BASAL_METABOLIC_RATE = ?</string>
+    <string name="type_calories_expended">TYPE_CALORIES_EXPENDED = ?</string>
+    <string name="type_cycling_pedaling_cadence">TYPE_CYCLING_PEDALING_CADENCE = ?</string>
+    <string name="type_cycling_pedaling_cumulative">TYPE_CYCLING_PEDALING_CUMULATIVE = ?</string>
+    <string name="type_move_minutes">TYPE_MOVE_MINUTES = ?</string>
+    <string name="type_step_count_cadence">TYPE_STEP_COUNT_CADENCE = ?</string>
+    <string name="type_heart_points">TYPE_HEART_POINTS = ?</string>
+    <string name="type_step_count_delta">TYPE_STEP_COUNT_DELTA = ?</string>
+    <string name="type_body_fat_percentage">TYPE_BODY_FAT_PERCENTAGE = ?</string>
+    <string name="type_weight">TYPE_WEIGHT = ?</string>
+    <string name="aggregate_calories_expended">AGGREGATE_CALORIES_EXPENDED = ?</string>
+</resources>
