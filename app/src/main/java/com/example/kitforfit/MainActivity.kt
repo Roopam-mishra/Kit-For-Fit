@@ -936,22 +936,24 @@ class MainActivity : AppCompatActivity() {
         val endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
         val startTime = endTime.minusDays(1)
 
+        // UPDATE WEIGHT
+
         // Create a data source
         val dataSource  = DataSource.Builder()
             .setAppPackageName(this)
-            .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-            .setStreamName("$TAG - step count")
+            .setDataType(DataType.TYPE_WEIGHT)
+            .setStreamName("$TAG - weight")
             .setType(DataSource.TYPE_RAW)
             .build()
 
         // Create a data set
         // For each data point, specify a start time, end time, and the
         // data value -- in this case, 1000 new steps.
-        val stepCountDelta = 1800
+        val typeWeight = 59f
 
         val dataPoint = DataPoint.builder(dataSource)
             .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-            .setField(Field.FIELD_STEPS, stepCountDelta)
+            .setField(Field.FIELD_WEIGHT, typeWeight)
             .build()
 
         val dataSet = DataSet.builder(dataSource)
