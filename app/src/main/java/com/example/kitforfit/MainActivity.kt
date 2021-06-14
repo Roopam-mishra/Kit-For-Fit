@@ -49,31 +49,31 @@ class MainActivity : AppCompatActivity() {
             .addDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
             .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)  //TYPE_STEP_COUNT_DELTA
             .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
-            .addDataType(DataType.TYPE_HEART_POINTS)  //FIELD_INTENSITY
-            .addDataType(DataType.AGGREGATE_HEART_POINTS) //FIELD_INTENSITY FIELD_DURATION
-            .addDataType(DataType.AGGREGATE_DISTANCE_DELTA)
+            .addDataType(DataType.TYPE_HEART_POINTS, FitnessOptions.ACCESS_WRITE)  //FIELD_INTENSITY
+            .addDataType(DataType.AGGREGATE_HEART_POINTS, FitnessOptions.ACCESS_WRITE) //FIELD_INTENSITY FIELD_DURATION
+            .addDataType(DataType.AGGREGATE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
             .addDataType(DataType.AGGREGATE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
             .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)  // FIELD_CALORIES
-            .addDataType(DataType.TYPE_MOVE_MINUTES)  // FIELD_DURATION
-            .addDataType(DataType.AGGREGATE_MOVE_MINUTES)
-            .addDataType(DataType.TYPE_STEP_COUNT_CADENCE) //FIELD_RPM
-            .addDataType(DataType.TYPE_ACTIVITY_SEGMENT) // FIELD_ACTIVITY
-            .addDataType(DataType.TYPE_BASAL_METABOLIC_RATE) // FIELD_CALORIES
-            .addDataType(DataType.TYPE_CYCLING_PEDALING_CADENCE) //FIELD_RPM
-            .addDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE) //FIELD_REVOLUTIONS
-            .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE) //FIELD_PERCENTAGE
-            .addDataType(DataType.TYPE_WEIGHT) //FIELD_WEIGHT
-            .addDataType(DataType.TYPE_DISTANCE_DELTA) //FIELD_DISTANCE
-            .addDataType(DataType.TYPE_LOCATION_SAMPLE) //FIELD_LATITUDE FIELD_LONGITUDE FIELD_ACCURACY FIELD_ALTITUDE
-            .addDataType(DataType.TYPE_SPEED) //speed
-            .addDataType(DataType.TYPE_HYDRATION) //FIELD_VOLUME
-            .addDataType(DataType.TYPE_SLEEP_SEGMENT) //FIELD_SLEEP_SEGMENT_TYPE
-            .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY) //FIELD_ACTIVITY FIELD_DURATION FIELD_NUM_SEGMENTS
-            .addDataType(DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY) //FIELD_AVERAGE FIELD_MAX FIELD_MIN
-            .addDataType(DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-            .addDataType(DataType.AGGREGATE_HEART_RATE_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-            .addDataType(DataType.AGGREGATE_WEIGHT_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-            .addDataType(DataType.AGGREGATE_SPEED_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.TYPE_MOVE_MINUTES, FitnessOptions.ACCESS_WRITE)  // FIELD_DURATION
+            .addDataType(DataType.AGGREGATE_MOVE_MINUTES, FitnessOptions.ACCESS_WRITE)
+            .addDataType(DataType.TYPE_STEP_COUNT_CADENCE, FitnessOptions.ACCESS_WRITE) //FIELD_RPM
+            .addDataType(DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_WRITE) // FIELD_ACTIVITY
+            .addDataType(DataType.TYPE_BASAL_METABOLIC_RATE, FitnessOptions.ACCESS_WRITE) // FIELD_CALORIES
+            .addDataType(DataType.TYPE_CYCLING_PEDALING_CADENCE, FitnessOptions.ACCESS_WRITE) //FIELD_RPM
+            .addDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE, FitnessOptions.ACCESS_WRITE) //FIELD_REVOLUTIONS
+            .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE, FitnessOptions.ACCESS_WRITE) //FIELD_PERCENTAGE
+            .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE) //FIELD_WEIGHT
+            .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE) //FIELD_DISTANCE
+            .addDataType(DataType.TYPE_LOCATION_SAMPLE, FitnessOptions.ACCESS_WRITE) //FIELD_LATITUDE FIELD_LONGITUDE FIELD_ACCURACY FIELD_ALTITUDE
+            .addDataType(DataType.TYPE_SPEED, FitnessOptions.ACCESS_WRITE) //speed
+            .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE) //FIELD_VOLUME
+            .addDataType(DataType.TYPE_SLEEP_SEGMENT, FitnessOptions.ACCESS_WRITE) //FIELD_SLEEP_SEGMENT_TYPE
+            .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY, FitnessOptions.ACCESS_WRITE) //FIELD_ACTIVITY FIELD_DURATION FIELD_NUM_SEGMENTS
+            .addDataType(DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY, FitnessOptions.ACCESS_WRITE) //FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY, FitnessOptions.ACCESS_WRITE)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_HEART_RATE_SUMMARY, FitnessOptions.ACCESS_WRITE)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_WEIGHT_SUMMARY, FitnessOptions.ACCESS_WRITE)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_SPEED_SUMMARY, FitnessOptions.ACCESS_WRITE)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
             .build()
     }
 
@@ -541,11 +541,10 @@ class MainActivity : AppCompatActivity() {
             Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
                 .readData(readRequest)
                 .addOnSuccessListener { response ->
+                    var fat = 0f
                     for (dataSet in response.buckets.flatMap { it.dataSets }) {
                         if(dataSet.isEmpty) {
                             Log.i(TAG, "Dataset is empty")
-                            val textView: TextView = findViewById(R.id.type_body_fat_percentage)
-                            textView.text = "TYPE_BODY_FAT_PERCENTAGE = 0"
                         } else {
                             for (dp in dataSet.dataPoints) {
                                 Log.i(TAG, "Data point:")
@@ -554,12 +553,13 @@ class MainActivity : AppCompatActivity() {
                                 Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                 for (field in dp.dataType.fields) {
                                     Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.type_body_fat_percentage)
-                                    textView.text = "TYPE_BODY_FAT_PERCENTAGE = ${dp.getValue(field)}"
+                                    fat += dp.getValue(field).asFloat()
                                 }
                             }
                         }
                     }
+                    val textView: TextView = findViewById(R.id.type_body_fat_percentage)
+                    textView.text = "TYPE_BODY_FAT_PERCENTAGE = ${fat}"
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
@@ -897,7 +897,37 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG, "There was an error adding the DataSet", e)
                 }
 
+            // TYPE_BODY_FAT_PERCENTAGE
 
+            dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_BODY_FAT_PERCENTAGE)
+                .setStreamName("$TAG - type step count cadence")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+//             For each data point, specify a start time, end time, and the
+//             data value -- in this case, 950 new steps.
+
+            val fatPercentage = 2f
+            dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_PERCENTAGE, fatPercentage)
+                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+
+            dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
         }
 
     // UPDATE_DATA
