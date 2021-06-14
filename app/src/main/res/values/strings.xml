@@ -21,4 +21,6 @@
     <string name="type_weight">TYPE_WEIGHT = ?</string>
     <string name="aggregate_calories_expended">AGGREGATE_CALORIES_EXPENDED = ?</string>
     <string name="type_distance_delta">TYPE_DISTANCE_DELTA = ?</string>
+    <string name="type_location_sample">TYPE_LOCATION_SAMPLE = ?</string>
+    <string name="type_speed">TYPE_SPEED = ?</string>
 </resources>

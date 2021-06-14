@@ -72,5 +72,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/type_distance_delta"/>
+    <TextView
+        android:id="@+id/type_location_sample"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/type_location_sample"/>
+    <TextView
+        android:id="@+id/type_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/type_speed"/>
 
 </LinearLayout>
