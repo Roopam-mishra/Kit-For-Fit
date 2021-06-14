@@ -23,4 +23,5 @@
     <string name="type_distance_delta">TYPE_DISTANCE_DELTA = ?</string>
     <string name="type_location_sample">TYPE_LOCATION_SAMPLE = ?</string>
     <string name="type_speed">TYPE_SPEED = ?</string>
+    <string name="type_hydration">TYPE_HYDRATION = ?</string>
 </resources>

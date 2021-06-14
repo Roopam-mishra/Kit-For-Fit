@@ -754,6 +754,70 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
 
+            // TYPE_HYDRATION
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_HYDRATION)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { dataReadResult ->
+                    var x = 0f
+                    if (dataReadResult.buckets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+                        for (bucket in dataReadResult.buckets) {
+                            bucket.dataSets.forEach { dataSet ->
+                                if(dataSet.isEmpty) {
+                                    Log.i(TAG, "Dataset is empty")
+                                    x += 0f
+                                } else {
+                                    for (dp in dataSet.dataPoints) {
+                                        Log.i(TAG, "Data point:")
+                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                        for (field in dp.dataType.fields) {
+                                            Log.i(
+                                                TAG,
+                                                "\tField: ${field.name.toString()} Value: ${
+                                                    dp.getValue(field)
+                                                }"
+                                            )
+                                            x += dp.getValue(field).asFloat()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+                        dataReadResult.dataSets.forEach { dataSet ->
+                            if(dataSet.isEmpty) {
+                                Log.i(TAG, "Dataset is empty")
+                                x += 0f
+                            } else {
+                                for (dp in dataSet.dataPoints) {
+                                    Log.i(TAG, "Data point:")
+                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                    for (field in dp.dataType.fields) {
+                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                        x += dp.getValue(field).asFloat()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    val textView: TextView = findViewById(R.id.type_speed)
+                    textView.text = "TYPE_HYDRATION = ${x}"
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
+
         }
 
 //    private fun dumpDataSet(dataSet: DataSet) {
@@ -1054,7 +1118,37 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG, "There was an error adding the DataSet", e)
                 }
 
+            // TYPE_HYDRATION
 
+            dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_HYDRATION)
+                .setStreamName("$TAG - type hydration")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+//             For each data point, specify a start time, end time, and the
+//             data value -- in this case, 950 new steps.
+
+            var litres = 12f
+            dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_VOLUME, litres)
+                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+
+            dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
         }
 
     // UPDATE_DATA
