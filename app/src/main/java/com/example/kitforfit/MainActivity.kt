@@ -266,7 +266,9 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        val textView: TextView = findViewById(R.id.type_calories_expended)
+                        var textView: TextView = findViewById(R.id.type_calories_expended)
+                        textView.text = "TYPE_CALORIES_EXPENDED = ${x}"
+                        textView = findViewById(R.id.aggregate_calories_expended)
                         textView.text = "TYPE_CALORIES_EXPENDED = ${x}"
                     } else if (dataReadResult.dataSets.isNotEmpty()) {
                         var x = 0f
@@ -289,7 +291,9 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        val textView: TextView = findViewById(R.id.type_calories_expended)
+                        var textView: TextView = findViewById(R.id.type_calories_expended)
+                        textView.text = "TYPE_CALORIES_EXPENDED = ${x}"
+                        textView = findViewById(R.id.aggregate_calories_expended)
                         textView.text = "TYPE_CALORIES_EXPENDED = ${x}"
                     }
                 }
@@ -627,40 +631,6 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
 
-            // AGGREGATE_CALORIES_EXPENDED
-
-            readRequest =
-                DataReadRequest.Builder()
-                    .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
-                    .bucketByActivityType(1, TimeUnit.HOURS)
-                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-                .readData(readRequest)
-                .addOnSuccessListener { response ->
-                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                        if(dataSet.isEmpty) {
-                            Log.i(TAG, "Dataset is empty")
-                            val textView: TextView = findViewById(R.id.aggregate_calories_expended)
-                            textView.text = "AGGREGATE_CALORIES_EXPENDED = 0"
-                        } else {
-                            for (dp in dataSet.dataPoints) {
-                                Log.i(TAG, "Data point:")
-                                Log.i(TAG, "\tType: ${dp.dataType.name}")
-                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                                for (field in dp.dataType.fields) {
-                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.aggregate_calories_expended)
-                                    textView.text = "AGGREGATE_CALORIES_EXPENDED = ${dp.getValue(field)}"
-                                }
-                            }
-                        }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG,"There was an error reading data from Google Fit", e)
-                }
         }
 
 //    private fun dumpDataSet(dataSet: DataSet) {
@@ -877,10 +847,10 @@ class MainActivity : AppCompatActivity() {
 //             For each data point, specify a start time, end time, and the
 //             data value -- in this case, 950 new steps.
 
-            val moveMinutes = 100f
+            val stepCountCadence = 100f
             dataPoint =
                 DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_RPM, moveMinutes)
+                    .setField(Field.FIELD_RPM, stepCountCadence)
                     .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 
