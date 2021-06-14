@@ -373,21 +373,69 @@ class MainActivity : AppCompatActivity() {
                 }
 
             // TYPE_HEART_POINTS
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .readDailyTotal(DataType.TYPE_HEART_POINTS)
-                .addOnSuccessListener { dataSet ->
-                    val total = when {
-                        dataSet.isEmpty -> 0
-                        else -> DataType.AGGREGATE_HEART_POINTS.toString()
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_HEART_POINTS)
+                    .bucketByActivityType(1, TimeUnit.HOURS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { dataReadResult ->
+                    if (dataReadResult.buckets.isNotEmpty()) {
+                        var x = 0f
+                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+                        for (bucket in dataReadResult.buckets) {
+                            bucket.dataSets.forEach { dataSet ->
+                                if(dataSet.isEmpty) {
+                                    Log.i(TAG, "Dataset is empty")
+                                    x += 0
+                                } else {
+                                    for (dp in dataSet.dataPoints) {
+                                        Log.i(TAG, "Data point:")
+                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                        for (field in dp.dataType.fields) {
+                                            Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                            if(field.name.toString() == "intensity") {
+                                                x += dp.getValue(field).asFloat()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        val textView: TextView = findViewById(R.id.type_heart_points)
+                        textView.text = "TYPE_HEART_POINTS = ${x}"
+                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        var x = 0f
+                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+                        dataReadResult.dataSets.forEach { dataSet ->
+                            if(dataSet.isEmpty) {
+                                Log.i(TAG, "Dataset is empty")
+                                x += 0
+                            } else {
+                                for (dp in dataSet.dataPoints) {
+                                    Log.i(TAG, "Data point:")
+                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                    for (field in dp.dataType.fields) {
+                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                        if(field.name.toString() == "intensity") {
+                                            x += dp.getValue(field).asFloat()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        val textView: TextView = findViewById(R.id.type_heart_points)
+                        textView.text = "TYPE_HEART_POINTS = ${x}"
                     }
-                    Log.i(TAG, "Heart Points: $total")
-                    val textView: TextView = findViewById(R.id.type_heart_points)
-                    textView.text = "TYPE_HEART_POINTS = ${total}"
-
                 }
                 .addOnFailureListener { e ->
-                    Log.w(TAG, "There was a problem getting the step count.", e)
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
 
             // TYPE_MOVE_MINUTES
@@ -672,7 +720,7 @@ class MainActivity : AppCompatActivity() {
             var dataSet = DataSet.builder(dataSource)
                 .add(dataPoint)
                 .build()
-//
+
             Fitness.getHistoryClient(this, getGoogleAccount())
                 .insertData(dataSet)
                 .addOnSuccessListener {
@@ -810,6 +858,8 @@ class MainActivity : AppCompatActivity() {
                 .addOnFailureListener { e ->
                     Log.w(TAG, "There was an error adding the DataSet", e)
                 }
+
+
         }
 
     // UPDATE_DATA
