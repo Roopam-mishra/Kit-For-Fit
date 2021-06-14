@@ -513,7 +513,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
 
-            //TYPE_STEP_COUNT_DELTA
+            // TYPE_STEP_COUNT_DELTA
 
             Fitness.getHistoryClient(this, getGoogleAccount())
                 .readDailyTotal(DataType.TYPE_STEP_COUNT_DELTA)
