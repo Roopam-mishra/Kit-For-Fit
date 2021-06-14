@@ -67,5 +67,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/aggregate_calories_expended"/>
+    <TextView
+        android:id="@+id/type_distance_delta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/type_distance_delta"/>
 
 </LinearLayout>

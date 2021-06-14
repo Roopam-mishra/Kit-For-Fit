@@ -20,4 +20,5 @@
     <string name="type_body_fat_percentage">TYPE_BODY_FAT_PERCENTAGE = ?</string>
     <string name="type_weight">TYPE_WEIGHT = ?</string>
     <string name="aggregate_calories_expended">AGGREGATE_CALORIES_EXPENDED = ?</string>
+    <string name="type_distance_delta">TYPE_DISTANCE_DELTA = ?</string>
 </resources>

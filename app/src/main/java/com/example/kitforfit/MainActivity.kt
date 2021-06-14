@@ -631,6 +631,66 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
 
+            // TYPE_DISTANCE_DELTA
+
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_DISTANCE_DELTA)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { dataReadResult ->
+                    var x = 0f
+                    if (dataReadResult.buckets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+                        for (bucket in dataReadResult.buckets) {
+                            bucket.dataSets.forEach { dataSet ->
+                                if(dataSet.isEmpty) {
+                                    Log.i(TAG, "Dataset is empty")
+                                    x += 0f
+                                } else {
+                                    for (dp in dataSet.dataPoints) {
+                                        Log.i(TAG, "Data point:")
+                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                        for (field in dp.dataType.fields) {
+                                            Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                            x += dp.getValue(field).asFloat()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+                        dataReadResult.dataSets.forEach { dataSet ->
+                            if(dataSet.isEmpty) {
+                                Log.i(TAG, "Dataset is empty")
+                                x += 0f
+                            } else {
+                                for (dp in dataSet.dataPoints) {
+                                    Log.i(TAG, "Data point:")
+                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                    for (field in dp.dataType.fields) {
+                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                        x += dp.getValue(field).asFloat()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    val textView: TextView = findViewById(R.id.type_distance_delta)
+                    textView.text = "TYPE_DISTANCE_DELTA = ${x}"
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
+
         }
 
 //    private fun dumpDataSet(dataSet: DataSet) {
@@ -883,6 +943,38 @@ class MainActivity : AppCompatActivity() {
             dataPoint =
                 DataPoint.builder(dataSource)
                     .setField(Field.FIELD_PERCENTAGE, fatPercentage)
+                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+
+            dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
+
+            // TYPE_DISTANCE_DELTA
+
+            dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_DISTANCE_DELTA)
+                .setStreamName("$TAG - type distance delta")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+//             For each data point, specify a start time, end time, and the
+//             data value -- in this case, 950 new steps.
+
+            var distanceDelta = 24f
+            dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_DISTANCE, distanceDelta)
                     .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 
