@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
             // TYPE_HEART_POINTS
             readRequest =
                 DataReadRequest.Builder()
-                    .read(DataType.TYPE_HEART_POINTS)
+                    .aggregate(DataType.TYPE_HEART_POINTS)
                     .bucketByActivityType(1, TimeUnit.HOURS)
                     .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
@@ -449,6 +449,7 @@ class MainActivity : AppCompatActivity() {
             Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
                 .readData(readRequest)
                 .addOnSuccessListener { response ->
+                    var x = 0
                     for (dataSet in response.buckets.flatMap { it.dataSets }) {
                         if(dataSet.isEmpty) {
                             Log.i(TAG, "Dataset is empty")
@@ -462,12 +463,13 @@ class MainActivity : AppCompatActivity() {
                                 Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                 for (field in dp.dataType.fields) {
                                     Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.type_move_minutes)
-                                    textView.text = "TYPE_MOVE_MINUTES = ${dp.getValue(field)}"
+                                    x += dp.getValue(field).asInt()
                                 }
                             }
                         }
                     }
+                    val textView: TextView = findViewById(R.id.type_move_minutes)
+                    textView.text = "TYPE_MOVE_MINUTES = ${x}"
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
