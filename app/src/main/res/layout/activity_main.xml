@@ -92,5 +92,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/type_sleep_segment"/>
+    <TextView
+        android:id="@+id/type_heart_rate_bpm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/type_heart_rate_bpm"/>
 
 </LinearLayout>

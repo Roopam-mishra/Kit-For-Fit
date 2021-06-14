@@ -1007,10 +1007,204 @@ class MainActivity : AppCompatActivity() {
 //                .addOnFailureListener { e ->
 //                    Log.w(TAG,"There was an error reading data from Google Fit", e)
 //                }
+//
+//            // AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY
+//            readRequest = DataReadRequest.Builder()
+//                .aggregate(DataType.TYPE_BODY_FAT_PERCENTAGE, DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)
+//                .bucketByTime(1, TimeUnit.DAYS)
+//                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                .build()
+//            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+//                .readData(readRequest)
+//                .addOnSuccessListener { dataReadResult ->
+//                    var x = 0
+//                    if (dataReadResult.buckets.isNotEmpty()) {
+//                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+//                        for (bucket in dataReadResult.buckets) {
+//                            bucket.dataSets.forEach { dataSet ->
+//                                if(dataSet.isEmpty) {
+//                                    Log.i(TAG, "Dataset is empty")
+//                                    x += 0
+//                                } else {
+//                                    for (dp in dataSet.dataPoints) {
+//                                        Log.i(TAG, "Data point:")
+//                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+//                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+//                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+//                                        for (field in dp.dataType.fields) {
+//                                            Log.i(
+//                                                TAG,
+//                                                "\tField: ${field.name.toString()} Value: ${
+//                                                    dp.getValue(field)
+//                                                }"
+//                                            )
+////                                            x += dp.getValue(field).asInt()
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+//                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+//                        dataReadResult.dataSets.forEach { dataSet ->
+//                            if(dataSet.isEmpty) {
+//                                Log.i(TAG, "Dataset is empty")
+//                                x += 0
+//                            } else {
+//                                for (dp in dataSet.dataPoints) {
+//                                    Log.i(TAG, "Data point:")
+//                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+//                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+//                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+//                                    for (field in dp.dataType.fields) {
+//                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+////                                        x += dp.getValue(field).asInt()
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+////                    val textView: TextView = findViewById(R.id.type_speed)
+////                    textView.text = "TYPE_SLEEP_SEGMENT = ${x}"
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+//                }
+//
+//            // AGGREGATE_WEIGHT_SUMMARY
+//            readRequest = DataReadRequest.Builder()
+//                .aggregate(DataType.TYPE_WEIGHT, DataType.AGGREGATE_WEIGHT_SUMMARY)
+//                .bucketByTime(1, TimeUnit.DAYS)
+//                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                .build()
+//            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+//                .readData(readRequest)
+//                .addOnSuccessListener { dataReadResult ->
+//                    var x = 0
+//                    if (dataReadResult.buckets.isNotEmpty()) {
+//                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+//                        for (bucket in dataReadResult.buckets) {
+//                            bucket.dataSets.forEach { dataSet ->
+//                                if(dataSet.isEmpty) {
+//                                    Log.i(TAG, "Dataset is empty")
+//                                    x += 0
+//                                } else {
+//                                    for (dp in dataSet.dataPoints) {
+//                                        Log.i(TAG, "Data point:")
+//                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+//                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+//                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+//                                        for (field in dp.dataType.fields) {
+//                                            Log.i(
+//                                                TAG,
+//                                                "\tField: ${field.name.toString()} Value: ${
+//                                                    dp.getValue(field)
+//                                                }"
+//                                            )
+////                                            x += dp.getValue(field).asInt()
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+//                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+//                        dataReadResult.dataSets.forEach { dataSet ->
+//                            if(dataSet.isEmpty) {
+//                                Log.i(TAG, "Dataset is empty")
+//                                x += 0
+//                            } else {
+//                                for (dp in dataSet.dataPoints) {
+//                                    Log.i(TAG, "Data point:")
+//                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+//                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+//                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+//                                    for (field in dp.dataType.fields) {
+//                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+////                                        x += dp.getValue(field).asInt()
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+////                    val textView: TextView = findViewById(R.id.type_speed)
+////                    textView.text = "TYPE_SLEEP_SEGMENT = ${x}"
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+//                }
 
-            // AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY
+
+            // TYPE_HEART_RATE_BPM
+
             readRequest = DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_BODY_FAT_PERCENTAGE, DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)
+                .aggregate(DataType.TYPE_HEART_RATE_BPM)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { dataReadResult ->
+                    var x = 0f
+                    var count = 0
+                    if (dataReadResult.buckets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+                        for (bucket in dataReadResult.buckets) {
+                            bucket.dataSets.forEach { dataSet ->
+                                if(dataSet.isEmpty) {
+                                    Log.i(TAG, "Dataset is empty")
+                                    x += 0f
+                                } else {
+                                    for (dp in dataSet.dataPoints) {
+                                        Log.i(TAG, "Data point:")
+                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                        for (field in dp.dataType.fields) {
+                                            Log.i(
+                                                TAG,
+                                                "\tField: ${field.name.toString()} Value: ${
+                                                    dp.getValue(field)
+                                                }"
+                                            )
+                                            x += dp.getValue(field).asFloat()
+                                            count++
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+                        dataReadResult.dataSets.forEach { dataSet ->
+                            if(dataSet.isEmpty) {
+                                Log.i(TAG, "Dataset is empty")
+                                x += 0f
+                            } else {
+                                for (dp in dataSet.dataPoints) {
+                                    Log.i(TAG, "Data point:")
+                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                    for (field in dp.dataType.fields) {
+                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                        x += dp.getValue(field).asFloat()
+                                        count++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    val textView: TextView = findViewById(R.id.type_heart_rate_bpm)
+                    textView.text = "TYPE_HEART_RATE_BPM = ${x/count}"
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
+
+            // AGGREGATE_HEART_RATE_SUMMARY
+            readRequest = DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                 .build()
@@ -1135,246 +1329,310 @@ class MainActivity : AppCompatActivity() {
                 .add(dataPoint)
                 .build()
 
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_BASAL_METABOLIC_RATE
+//
+//            // Create a data source
+//            val calendar = Calendar.getInstance()
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_BASAL_METABOLIC_RATE)
+//                .setStreamName("$TAG - basal_metabolic_rate")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+//            // For each data point, specify a start time, end time, and the
+//            // data value -- in this case, 950 new steps.
+//            val bmrData = 600f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_CALORIES,bmrData)
+//                    .setTimeInterval(1, calendar.timeInMillis, TimeUnit.MILLISECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_CALORIES_EXPENDED
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
+//                .setStreamName("$TAG - calories_expended")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+//            // For each data point, specify a start time, end time, and the
+//            // data value -- in this case, 950 new steps.
+//
+//            val caloriesBurned = 1000f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_CALORIES, caloriesBurned)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_CYCLING_PEDALING_CADENCE
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_CYCLING_PEDALING_CADENCE)
+//                .setStreamName("$TAG - type cycling pedaling cadence")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+//            // For each data point, specify a start time, end time, and the
+//            // data value -- in this case, 950 new steps.
+//
+//            val cyclingPedalingCadence = 1000f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_RPM, cyclingPedalingCadence)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_CYCLING_PEDALING_CUMULATIVE
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE)
+//                .setStreamName("$TAG - type cycling pedaling cumulative")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+////             For each data point, specify a start time, end time, and the
+////             data value -- in this case, 950 new steps.
+//
+//            val cyclingPedalingCumulative = 100
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_REVOLUTIONS, cyclingPedalingCumulative)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//
+//            // TYPE_STEP_COUNT_CADENCE
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_STEP_COUNT_CADENCE)
+//                .setStreamName("$TAG - type step count cadence")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+////             For each data point, specify a start time, end time, and the
+////             data value -- in this case, 950 new steps.
+//
+//            val stepCountCadence = 100f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_RPM, stepCountCadence)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_BODY_FAT_PERCENTAGE
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_BODY_FAT_PERCENTAGE)
+//                .setStreamName("$TAG - type step count cadence")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+////             For each data point, specify a start time, end time, and the
+////             data value -- in this case, 950 new steps.
+//
+//            val fatPercentage = 2f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_PERCENTAGE, fatPercentage)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_DISTANCE_DELTA
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_DISTANCE_DELTA)
+//                .setStreamName("$TAG - type distance delta")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+////             For each data point, specify a start time, end time, and the
+////             data value -- in this case, 950 new steps.
+//
+//            var distanceDelta = 24f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_DISTANCE, distanceDelta)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
+//
+//            // TYPE_HYDRATION
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_HYDRATION)
+//                .setStreamName("$TAG - type hydration")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+////             For each data point, specify a start time, end time, and the
+////             data value -- in this case, 950 new steps.
+//
+//            var litres = 12f
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_VOLUME, litres)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
 
-            // TYPE_BASAL_METABOLIC_RATE
+//            // TYPE_SLEEP_SEGMENT
+//
+//            dataSource = DataSource.Builder()
+//                .setAppPackageName(this)
+//                .setDataType(DataType.TYPE_SLEEP_SEGMENT)
+//                .setStreamName("$TAG - type hydration")
+//                .setType(DataSource.TYPE_RAW)
+//                .build()
+//
+////             For each data point, specify a start time, end time, and the
+////             data value -- in this case, 950 new steps.
+//
+//            var hours = 12
+//            dataPoint =
+//                DataPoint.builder(dataSource)
+//                    .setField(Field.FIELD_SLEEP_SEGMENT_TYPE, hours)
+//                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                    .build()
+//
+//            dataSet = DataSet.builder(dataSource)
+//                .add(dataPoint)
+//                .build()
+//
+//            Fitness.getHistoryClient(this, getGoogleAccount())
+//                .insertData(dataSet)
+//                .addOnSuccessListener {
+//                    Log.i(TAG, "DataSet added successfully!")
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG, "There was an error adding the DataSet", e)
+//                }
 
-            // Create a data source
-            val calendar = Calendar.getInstance()
+            // TYPE_HEART_RATE_BPM
+
             dataSource = DataSource.Builder()
                 .setAppPackageName(this)
-                .setDataType(DataType.TYPE_BASAL_METABOLIC_RATE)
-                .setStreamName("$TAG - basal_metabolic_rate")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-            // For each data point, specify a start time, end time, and the
-            // data value -- in this case, 950 new steps.
-            val bmrData = 600f
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_CALORIES,bmrData)
-                    .setTimeInterval(1, calendar.timeInMillis, TimeUnit.MILLISECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_CALORIES_EXPENDED
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
-                .setStreamName("$TAG - calories_expended")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-            // For each data point, specify a start time, end time, and the
-            // data value -- in this case, 950 new steps.
-
-            val caloriesBurned = 1000f
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_CALORIES, caloriesBurned)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_CYCLING_PEDALING_CADENCE
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_CYCLING_PEDALING_CADENCE)
-                .setStreamName("$TAG - type cycling pedaling cadence")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-            // For each data point, specify a start time, end time, and the
-            // data value -- in this case, 950 new steps.
-
-            val cyclingPedalingCadence = 1000f
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_RPM, cyclingPedalingCadence)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_CYCLING_PEDALING_CUMULATIVE
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE)
-                .setStreamName("$TAG - type cycling pedaling cumulative")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-//             For each data point, specify a start time, end time, and the
-//             data value -- in this case, 950 new steps.
-
-            val cyclingPedalingCumulative = 100
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_REVOLUTIONS, cyclingPedalingCumulative)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-
-            // TYPE_STEP_COUNT_CADENCE
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_STEP_COUNT_CADENCE)
-                .setStreamName("$TAG - type step count cadence")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-//             For each data point, specify a start time, end time, and the
-//             data value -- in this case, 950 new steps.
-
-            val stepCountCadence = 100f
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_RPM, stepCountCadence)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_BODY_FAT_PERCENTAGE
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_BODY_FAT_PERCENTAGE)
-                .setStreamName("$TAG - type step count cadence")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-//             For each data point, specify a start time, end time, and the
-//             data value -- in this case, 950 new steps.
-
-            val fatPercentage = 2f
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_PERCENTAGE, fatPercentage)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_DISTANCE_DELTA
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_DISTANCE_DELTA)
-                .setStreamName("$TAG - type distance delta")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-//             For each data point, specify a start time, end time, and the
-//             data value -- in this case, 950 new steps.
-
-            var distanceDelta = 24f
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_DISTANCE, distanceDelta)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_HYDRATION
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_HYDRATION)
+                .setDataType(DataType.TYPE_HEART_RATE_BPM)
                 .setStreamName("$TAG - type hydration")
                 .setType(DataSource.TYPE_RAW)
                 .build()
@@ -1382,42 +1640,10 @@ class MainActivity : AppCompatActivity() {
 //             For each data point, specify a start time, end time, and the
 //             data value -- in this case, 950 new steps.
 
-            var litres = 12f
+            var bpm = 72f
             dataPoint =
                 DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_VOLUME, litres)
-                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                    .build()
-
-            dataSet = DataSet.builder(dataSource)
-                .add(dataPoint)
-                .build()
-
-            Fitness.getHistoryClient(this, getGoogleAccount())
-                .insertData(dataSet)
-                .addOnSuccessListener {
-                    Log.i(TAG, "DataSet added successfully!")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "There was an error adding the DataSet", e)
-                }
-
-            // TYPE_SLEEP_SEGMENT
-
-            dataSource = DataSource.Builder()
-                .setAppPackageName(this)
-                .setDataType(DataType.TYPE_SLEEP_SEGMENT)
-                .setStreamName("$TAG - type hydration")
-                .setType(DataSource.TYPE_RAW)
-                .build()
-
-//             For each data point, specify a start time, end time, and the
-//             data value -- in this case, 950 new steps.
-
-            var hours = 12
-            dataPoint =
-                DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_SLEEP_SEGMENT_TYPE, hours)
+                    .setField(Field.FIELD_BPM, bpm)
                     .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 

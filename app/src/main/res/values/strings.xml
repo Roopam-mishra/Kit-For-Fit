@@ -25,4 +25,5 @@
     <string name="type_speed">TYPE_SPEED = ?</string>
     <string name="type_hydration">TYPE_HYDRATION = ?</string>
     <string name="type_sleep_segment">TYPE_SLEEP_SEGMENT = ?</string>
+    <string name="type_heart_rate_bpm">TYPE_HEART_RATE_BPM = ?</string>
 </resources>
