@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
 
             readRequest =
                 DataReadRequest.Builder()
-                    .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
+                    .aggregate(DataType.TYPE_CALORIES_EXPENDED)
                     .bucketByActivityType(1, TimeUnit.HOURS)
                     .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
@@ -244,6 +244,7 @@ class MainActivity : AppCompatActivity() {
                 .readData(readRequest)
                 .addOnSuccessListener { dataReadResult ->
                     if (dataReadResult.buckets.isNotEmpty()) {
+                        var x = 0f
                         Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
                         for (bucket in dataReadResult.buckets) {
                             bucket.dataSets.forEach { dataSet ->
@@ -259,14 +260,16 @@ class MainActivity : AppCompatActivity() {
                                         Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                         for (field in dp.dataType.fields) {
                                             Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                            val textView: TextView = findViewById(R.id.type_calories_expended)
-                                            textView.text = "TYPE_CALORIES_EXPENDED = ${dp.getValue(field)}"
+                                            x += dp.getValue(field).asFloat()
                                         }
                                     }
                                 }
                             }
                         }
+                        val textView: TextView = findViewById(R.id.type_calories_expended)
+                        textView.text = "TYPE_CALORIES_EXPENDED = ${x}"
                     } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        var x = 0f
                         Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
                         dataReadResult.dataSets.forEach { dataSet ->
                             if(dataSet.isEmpty) {
@@ -281,12 +284,13 @@ class MainActivity : AppCompatActivity() {
                                     Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                     for (field in dp.dataType.fields) {
                                         Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                        val textView: TextView = findViewById(R.id.type_calories_expended)
-                                        textView.text = "TYPE_CALORIES_EXPENDED = ${dp.getValue(field)}"
+                                        x += dp.getValue(field).asFloat()
                                     }
                                 }
                             }
                         }
+                        val textView: TextView = findViewById(R.id.type_calories_expended)
+                        textView.text = "TYPE_CALORIES_EXPENDED = ${x}"
                     }
                 }
                 .addOnFailureListener { e ->
@@ -691,6 +695,37 @@ class MainActivity : AppCompatActivity() {
                 DataPoint.builder(dataSource)
                     .setField(Field.FIELD_CALORIES,bmrData)
                     .setTimeInterval(1, calendar.timeInMillis, TimeUnit.MILLISECONDS)
+                    .build()
+
+            dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
+
+            // TYPE_CALORIES_EXPENDED
+            dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
+                .setStreamName("$TAG - calories_expended")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+            // For each data point, specify a start time, end time, and the
+            // data value -- in this case, 950 new steps.
+
+            val caloriesBurned = 1000f
+            dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_CALORIES, caloriesBurned)
+                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 
             dataSet = DataSet.builder(dataSource)
