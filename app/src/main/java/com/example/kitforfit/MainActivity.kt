@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
-            checkPermissionsAndRun(FitActionRequestCode.INSERT_DATA)
+            checkPermissionsAndRun(FitActionRequestCode.SUBSCRIBE)
         }
 
         private fun checkPermissionsAndRun(fitActionRequestCode: FitActionRequestCode) {
@@ -197,7 +197,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
             // TYPE_BASAL_METABOLIC_RATE
-
             readRequest =
                 DataReadRequest.Builder()
                     .aggregate(DataType.TYPE_BASAL_METABOLIC_RATE)
@@ -220,8 +219,10 @@ class MainActivity : AppCompatActivity() {
                                 Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                 for (field in dp.dataType.fields) {
                                     Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.type_basal_metabolic_rate)
-                                    textView.text = "TYPE_BASAL_METABOLIC_RATE = ${dp.getValue(field)}"
+                                    if(field.name.toString() == "average") {
+                                        val textView: TextView = findViewById(R.id.type_basal_metabolic_rate)
+                                        textView.text = "TYPE_BASAL_METABOLIC_RATE = ${dp.getValue(field)}"
+                                    }
                                 }
                             }
                         }
@@ -641,8 +642,10 @@ class MainActivity : AppCompatActivity() {
             var endTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).minusDays(1)
             var startTime = endTime.minusHours(2)
 
+            // TYPE_ACTIVITY_SEGMENT
+
             // Create a data source
-            val dataSource = DataSource.Builder()
+            var dataSource = DataSource.Builder()
                 .setAppPackageName(this)
                 .setDataType(DataType.TYPE_ACTIVITY_SEGMENT)
                 .setStreamName("$TAG - activity_segment")
@@ -651,14 +654,13 @@ class MainActivity : AppCompatActivity() {
 
             // For each data point, specify a start time, end time, and the
             // data value -- in this case, 950 new steps.
-            val stepCountDelta = 200
-            val dataPoint =
+            var dataPoint =
                 DataPoint.builder(dataSource)
                     .setActivityField(Field.FIELD_ACTIVITY, FitnessActivities.BADMINTON)
                     .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 
-            val dataSet = DataSet.builder(dataSource)
+            var dataSet = DataSet.builder(dataSource)
                 .add(dataPoint)
                 .build()
 
@@ -670,6 +672,40 @@ class MainActivity : AppCompatActivity() {
                 .addOnFailureListener { e ->
                     Log.w(TAG, "There was an error adding the DataSet", e)
                 }
+
+            // TYPE_BASAL_METABOLIC_RATE
+
+            // Create a data source
+            val calendar = Calendar.getInstance()
+            dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_BASAL_METABOLIC_RATE)
+                .setStreamName("$TAG - basal_metabolic_rate")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+            // For each data point, specify a start time, end time, and the
+            // data value -- in this case, 950 new steps.
+            val bmrData = 600f
+            dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_CALORIES,bmrData)
+                    .setTimeInterval(1, calendar.timeInMillis, TimeUnit.MILLISECONDS)
+                    .build()
+
+            dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
+
         }
 
     // UPDATE_DATA
