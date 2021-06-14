@@ -87,5 +87,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/type_hydration"/>
+    <TextView
+        android:id="@+id/type_sleep_segment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/type_sleep_segment"/>
 
 </LinearLayout>
