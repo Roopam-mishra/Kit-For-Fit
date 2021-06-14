@@ -944,10 +944,73 @@ class MainActivity : AppCompatActivity() {
 //                .addOnFailureListener { e ->
 //                    Log.w(TAG,"There was an error reading data from Google Fit", e)
 //                }
+//
+//            // AGGREGATE_HEART_POINTS
+//            readRequest = DataReadRequest.Builder()
+//                .aggregate(DataType.TYPE_HEART_POINTS, DataType.AGGREGATE_HEART_POINTS)
+//                .bucketByTime(1, TimeUnit.DAYS)
+//                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+//                .build()
+//            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+//                .readData(readRequest)
+//                .addOnSuccessListener { dataReadResult ->
+//                    var x = 0
+//                    if (dataReadResult.buckets.isNotEmpty()) {
+//                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+//                        for (bucket in dataReadResult.buckets) {
+//                            bucket.dataSets.forEach { dataSet ->
+//                                if(dataSet.isEmpty) {
+//                                    Log.i(TAG, "Dataset is empty")
+//                                    x += 0
+//                                } else {
+//                                    for (dp in dataSet.dataPoints) {
+//                                        Log.i(TAG, "Data point:")
+//                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+//                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+//                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+//                                        for (field in dp.dataType.fields) {
+//                                            Log.i(
+//                                                TAG,
+//                                                "\tField: ${field.name.toString()} Value: ${
+//                                                    dp.getValue(field)
+//                                                }"
+//                                            )
+////                                            x += dp.getValue(field).asInt()
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+//                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+//                        dataReadResult.dataSets.forEach { dataSet ->
+//                            if(dataSet.isEmpty) {
+//                                Log.i(TAG, "Dataset is empty")
+//                                x += 0
+//                            } else {
+//                                for (dp in dataSet.dataPoints) {
+//                                    Log.i(TAG, "Data point:")
+//                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+//                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+//                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+//                                    for (field in dp.dataType.fields) {
+//                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+////                                        x += dp.getValue(field).asInt()
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+////                    val textView: TextView = findViewById(R.id.type_speed)
+////                    textView.text = "TYPE_SLEEP_SEGMENT = ${x}"
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+//                }
 
-            // AGGREGATE_HEART_POINTS
+            // AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY
             readRequest = DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_HEART_POINTS, DataType.AGGREGATE_HEART_POINTS)
+                .aggregate(DataType.TYPE_BODY_FAT_PERCENTAGE, DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                 .build()
