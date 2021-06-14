@@ -347,11 +347,11 @@ class MainActivity : AppCompatActivity() {
             Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
                 .readData(readRequest)
                 .addOnSuccessListener { response ->
+                    var x = 0
                     for (dataSet in response.buckets.flatMap { it.dataSets }) {
                         if(dataSet.isEmpty) {
                             Log.i(TAG, "Dataset is empty")
-                            val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
-                            textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = 0"
+                            x += 0
                         } else {
                             for (dp in dataSet.dataPoints) {
                                 Log.i(TAG, "Data point:")
@@ -360,12 +360,13 @@ class MainActivity : AppCompatActivity() {
                                 Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                 for (field in dp.dataType.fields) {
                                     Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
-                                    textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = ${dp.getValue(field)}"
+                                    x += dp.getValue(field).asInt()
                                 }
                             }
                         }
                     }
+                    val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
+                    textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = ${x}"
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
@@ -671,7 +672,7 @@ class MainActivity : AppCompatActivity() {
             var dataSet = DataSet.builder(dataSource)
                 .add(dataPoint)
                 .build()
-
+//
             Fitness.getHistoryClient(this, getGoogleAccount())
                 .insertData(dataSet)
                 .addOnSuccessListener {
@@ -762,6 +763,38 @@ class MainActivity : AppCompatActivity() {
             dataPoint =
                 DataPoint.builder(dataSource)
                     .setField(Field.FIELD_RPM, cyclingPedalingCadence)
+                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+
+            dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
+
+            // TYPE_CYCLING_PEDALING_CUMULATIVE
+
+            dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE)
+                .setStreamName("$TAG - type cycling pedaling cumulative")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+//             For each data point, specify a start time, end time, and the
+//             data value -- in this case, 950 new steps.
+
+            val cyclingPedalingCumulative = 100
+            dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_REVOLUTIONS, cyclingPedalingCumulative)
                     .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 
