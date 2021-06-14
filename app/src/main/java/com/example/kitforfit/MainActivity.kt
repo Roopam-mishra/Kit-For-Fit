@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
+import com.google.android.gms.fitness.FitnessActivities
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.*
@@ -170,11 +171,10 @@ class MainActivity : AppCompatActivity() {
             Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
                 .readData(readRequest)
                 .addOnSuccessListener { response ->
+                    var x=0;
                     for (dataSet in response.buckets.flatMap { it.dataSets }) {
                         if(dataSet.isEmpty) {
                             Log.i(TAG, "Dataset is empty")
-                            val textView: TextView = findViewById(R.id.type_activity_segment)
-                            textView.text = "TYPE_ACTIVITY_SEGMENT = 0"
                         } else {
                             for (dp in dataSet.dataPoints) {
                                 Log.i(TAG, "Data point:")
@@ -183,12 +183,14 @@ class MainActivity : AppCompatActivity() {
                                 Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                 for (field in dp.dataType.fields) {
                                     Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.type_activity_segment)
-                                    textView.text = "TYPE_ACTIVITY_SEGMENT = ${dp.getValue(field)}"
+                                    x += dp.getValue(field).asInt()
                                 }
+                                Log.i(TAG, "${x}")
                             }
                         }
                     }
+                    val textView: TextView = findViewById(R.id.type_activity_segment)
+                    textView.text = "TYPE_ACTIVITY_SEGMENT = ${x}"
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG,"There was an error reading data from Google Fit", e)
@@ -636,23 +638,23 @@ class MainActivity : AppCompatActivity() {
         // INSERT DATA
 
         private fun insertData() {
-            var endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
-            var startTime = endTime.minusHours(1)
+            var endTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).minusDays(1)
+            var startTime = endTime.minusHours(2)
 
             // Create a data source
             val dataSource = DataSource.Builder()
                 .setAppPackageName(this)
-                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-                .setStreamName("$TAG - step count")
+                .setDataType(DataType.TYPE_ACTIVITY_SEGMENT)
+                .setStreamName("$TAG - activity_segment")
                 .setType(DataSource.TYPE_RAW)
                 .build()
 
             // For each data point, specify a start time, end time, and the
             // data value -- in this case, 950 new steps.
-            val stepCountDelta = 950
+            val stepCountDelta = 200
             val dataPoint =
                 DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_STEPS, stepCountDelta)
+                    .setActivityField(Field.FIELD_ACTIVITY, FitnessActivities.BADMINTON)
                     .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                     .build()
 
