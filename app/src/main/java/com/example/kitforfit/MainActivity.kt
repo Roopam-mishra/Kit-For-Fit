@@ -3,7 +3,9 @@ package com.example.kitforfit
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -14,9 +16,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
-import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.android.gms.fitness.request.DataSourcesRequest
-import com.google.android.gms.fitness.request.SensorRequest
+import com.google.android.gms.fitness.request.*
+import com.google.android.material.snackbar.Snackbar
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -34,452 +35,509 @@ const val TAG = "StepCounter"
  */
 enum class FitActionRequestCode {
     SUBSCRIBE,
-    READ_DATA
+    READ_DATA,
+    INSERT_DATA,
+    UPDATE_DATA,
+    DELETE_DATA
 }
 
 class MainActivity : AppCompatActivity() {
 
-    private val fitnessOptions = FitnessOptions.builder()
-        .addDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-        .addDataType(DataType.TYPE_STEP_COUNT_DELTA)  //TYPE_STEP_COUNT_DELTA
-        .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA)
-        .addDataType(DataType.TYPE_HEART_POINTS)  //FIELD_INTENSITY
-        .addDataType(DataType.AGGREGATE_HEART_POINTS) //FIELD_INTENSITY FIELD_DURATION
-        .addDataType(DataType.AGGREGATE_DISTANCE_DELTA)
-        .addDataType(DataType.AGGREGATE_CALORIES_EXPENDED)
-        .addDataType(DataType.TYPE_CALORIES_EXPENDED)  // FIELD_CALORIES
-        .addDataType(DataType.TYPE_MOVE_MINUTES)  // FIELD_DURATION
-        .addDataType(DataType.AGGREGATE_MOVE_MINUTES)
-        .addDataType(DataType.TYPE_STEP_COUNT_CADENCE) //FIELD_RPM
-        .addDataType(DataType.TYPE_ACTIVITY_SEGMENT) // FIELD_ACTIVITY
-        .addDataType(DataType.TYPE_BASAL_METABOLIC_RATE) // FIELD_CALORIES
-        .addDataType(DataType.TYPE_CYCLING_PEDALING_CADENCE) //FIELD_RPM
-        .addDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE) //FIELD_REVOLUTIONS
-        .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE) //FIELD_PERCENTAGE
-        .addDataType(DataType.TYPE_WEIGHT) //FIELD_WEIGHT
-        .addDataType(DataType.TYPE_DISTANCE_DELTA) //FIELD_DISTANCE
-        .addDataType(DataType.TYPE_LOCATION_SAMPLE) //FIELD_LATITUDE FIELD_LONGITUDE FIELD_ACCURACY FIELD_ALTITUDE
-        .addDataType(DataType.TYPE_SPEED) //speed
-        .addDataType(DataType.TYPE_HYDRATION) //FIELD_VOLUME
-        .addDataType(DataType.TYPE_SLEEP_SEGMENT) //FIELD_SLEEP_SEGMENT_TYPE
-        .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY) //FIELD_ACTIVITY FIELD_DURATION FIELD_NUM_SEGMENTS
-        .addDataType(DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY) //FIELD_AVERAGE FIELD_MAX FIELD_MIN
-        .addDataType(DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-        .addDataType(DataType.AGGREGATE_HEART_RATE_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-        .addDataType(DataType.AGGREGATE_WEIGHT_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-        .addDataType(DataType.AGGREGATE_SPEED_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
-        .build()
-
-    private val runningQOrLater =
-        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        checkPermissionsAndRun(FitActionRequestCode.SUBSCRIBE)
+    private val fitnessOptions: FitnessOptions by lazy {
+        FitnessOptions.builder()
+            .addDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+            .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)  //TYPE_STEP_COUNT_DELTA
+            .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
+            .addDataType(DataType.TYPE_HEART_POINTS)  //FIELD_INTENSITY
+            .addDataType(DataType.AGGREGATE_HEART_POINTS) //FIELD_INTENSITY FIELD_DURATION
+            .addDataType(DataType.AGGREGATE_DISTANCE_DELTA)
+            .addDataType(DataType.AGGREGATE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
+            .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)  // FIELD_CALORIES
+            .addDataType(DataType.TYPE_MOVE_MINUTES)  // FIELD_DURATION
+            .addDataType(DataType.AGGREGATE_MOVE_MINUTES)
+            .addDataType(DataType.TYPE_STEP_COUNT_CADENCE) //FIELD_RPM
+            .addDataType(DataType.TYPE_ACTIVITY_SEGMENT) // FIELD_ACTIVITY
+            .addDataType(DataType.TYPE_BASAL_METABOLIC_RATE) // FIELD_CALORIES
+            .addDataType(DataType.TYPE_CYCLING_PEDALING_CADENCE) //FIELD_RPM
+            .addDataType(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE) //FIELD_REVOLUTIONS
+            .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE) //FIELD_PERCENTAGE
+            .addDataType(DataType.TYPE_WEIGHT) //FIELD_WEIGHT
+            .addDataType(DataType.TYPE_DISTANCE_DELTA) //FIELD_DISTANCE
+            .addDataType(DataType.TYPE_LOCATION_SAMPLE) //FIELD_LATITUDE FIELD_LONGITUDE FIELD_ACCURACY FIELD_ALTITUDE
+            .addDataType(DataType.TYPE_SPEED) //speed
+            .addDataType(DataType.TYPE_HYDRATION) //FIELD_VOLUME
+            .addDataType(DataType.TYPE_SLEEP_SEGMENT) //FIELD_SLEEP_SEGMENT_TYPE
+            .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY) //FIELD_ACTIVITY FIELD_DURATION FIELD_NUM_SEGMENTS
+            .addDataType(DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY) //FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_HEART_RATE_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_WEIGHT_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .addDataType(DataType.AGGREGATE_SPEED_SUMMARY)//FIELD_AVERAGE FIELD_MAX FIELD_MIN
+            .build()
     }
 
-    private fun checkPermissionsAndRun(fitActionRequestCode: FitActionRequestCode) {
-        if (permissionApproved()) {
-            fitSignIn(fitActionRequestCode)
-        } else {
-//            requestRuntimePermissions(fitActionRequestCode)
+        private val runningQOrLater =
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_main)
+            checkPermissionsAndRun(FitActionRequestCode.INSERT_DATA)
         }
-    }
 
-    private fun fitSignIn(requestCode: FitActionRequestCode) {
-        if (oAuthPermissionsApproved()) {
-            performActionForRequestCode(requestCode)
-        } else {
-            requestCode.let {
-                GoogleSignIn.requestPermissions(
-                    this,
-                    requestCode.ordinal,
-                    getGoogleAccount(), fitnessOptions)
+        private fun checkPermissionsAndRun(fitActionRequestCode: FitActionRequestCode) {
+            if (permissionApproved()) {
+                fitSignIn(fitActionRequestCode)
+            } else {
+                requestRuntimePermissions(fitActionRequestCode)
             }
         }
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (resultCode) {
-            RESULT_OK -> {
-                val postSignInAction = FitActionRequestCode.values()[requestCode]
-                postSignInAction.let {
-                    performActionForRequestCode(postSignInAction)
+        private fun fitSignIn(requestCode:FitActionRequestCode ) {
+            if (oAuthPermissionsApproved()) {
+                performActionForRequestCode(requestCode)
+                Log.i(TAG, "$requestCode")
+            } else {
+                requestCode.let {
+                    GoogleSignIn.requestPermissions(
+                        this,
+                        requestCode.ordinal,
+                        getGoogleAccount(), fitnessOptions)
                 }
             }
-            else -> oAuthErrorMsg(requestCode, resultCode)
         }
-    }
-    private fun performActionForRequestCode(requestCode: FitActionRequestCode) = when (requestCode) {
-        FitActionRequestCode.READ_DATA -> readData()
-        FitActionRequestCode.SUBSCRIBE -> subscribe()
-    }
 
-    private fun oAuthErrorMsg(requestCode: Int, resultCode: Int) {
-        val message = """
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+
+            when (resultCode) {
+                RESULT_OK -> {
+                    val postSignInAction = FitActionRequestCode.values()[requestCode]
+                    postSignInAction.let {
+                        performActionForRequestCode(postSignInAction)
+                    }
+                }
+                else -> oAuthErrorMsg(requestCode, resultCode)
+            }
+        }
+        private fun performActionForRequestCode(requestCode: FitActionRequestCode) = when (requestCode) {
+            FitActionRequestCode.READ_DATA -> readData()
+            FitActionRequestCode.SUBSCRIBE -> subscribe()
+            FitActionRequestCode.INSERT_DATA -> insertData()
+            FitActionRequestCode.UPDATE_DATA -> updateData()
+            FitActionRequestCode.DELETE_DATA -> deleteData()
+        }
+
+        private fun oAuthErrorMsg(requestCode: Int, resultCode: Int) {
+            val message = """
             There was an error signing into Fit. Check the troubleshooting section of the README
             for potential issues.
             Request code was: $requestCode
             Result code was: $resultCode
         """.trimIndent()
-        Log.e(TAG, message)
-    }
+            Log.e(TAG, message)
+        }
 
-    private fun oAuthPermissionsApproved() = GoogleSignIn.hasPermissions(getGoogleAccount(), fitnessOptions)
-    private fun getGoogleAccount() = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
+        private fun oAuthPermissionsApproved() = GoogleSignIn.hasPermissions(getGoogleAccount(), fitnessOptions)
+        private fun getGoogleAccount() = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
 
-    private fun subscribe() {
-        Fitness.getRecordingClient(this, getGoogleAccount())
-            .subscribe(DataType.TYPE_LOCATION_SAMPLE)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.i(TAG, "Successfully subscribed for weight!")
-                } else {
-                    Log.w(TAG, "There was a problem subscribing.", task.exception)
-                }
-            }
-    }
-
-    private fun readData(){
-        var endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
-        var startTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault())
-        Log.i(TAG, "Range Start: $startTime")
-        Log.i(TAG, "Range End: $endTime")
-
-        // TYPE_ACTIVITY_SEGMENT
-
-        var readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_ACTIVITY_SEGMENT)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_activity_segment)
-                        textView.text = "TYPE_ACTIVITY_SEGMENT = 0"
+        private fun subscribe() {
+            Fitness.getRecordingClient(this, getGoogleAccount())
+                .subscribe(DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i(TAG, "Successfully subscribed for weight!")
                     } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_activity_segment)
-                                textView.text = "TYPE_ACTIVITY_SEGMENT = ${dp.getValue(field)}"
+                        Log.w(TAG, "There was a problem subscribing.", task.exception)
+                    }
+                }
+        }
+
+        private fun readData(){
+            var endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
+            var startTime = endTime.minusWeeks(1)
+            Log.i(TAG, "Range Start: $startTime")
+            Log.i(TAG, "Range End: $endTime")
+
+            // TYPE_ACTIVITY_SEGMENT
+
+            var readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_ACTIVITY_SEGMENT)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_activity_segment)
+                            textView.text = "TYPE_ACTIVITY_SEGMENT = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_activity_segment)
+                                    textView.text = "TYPE_ACTIVITY_SEGMENT = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
 
-        // TYPE_BASAL_METABOLIC_RATE
+            // TYPE_BASAL_METABOLIC_RATE
 
-        readRequest =
-            DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_BASAL_METABOLIC_RATE)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_basal_metabolic_rate)
-                        textView.text = "TYPE_BASAL_METABOLIC_RATE = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_basal_metabolic_rate)
-                                textView.text = "TYPE_BASAL_METABOLIC_RATE = ${dp.getValue(field)}"
+            readRequest =
+                DataReadRequest.Builder()
+                    .aggregate(DataType.TYPE_BASAL_METABOLIC_RATE)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_basal_metabolic_rate)
+                            textView.text = "TYPE_BASAL_METABOLIC_RATE = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_basal_metabolic_rate)
+                                    textView.text = "TYPE_BASAL_METABOLIC_RATE = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
 
-        //TYPE_CALORIES_EXPENDED
+            //TYPE_CALORIES_EXPENDED
 
-        readRequest =
-            DataReadRequest.Builder()
-                .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
-                .bucketByActivityType(1, TimeUnit.HOURS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_calories_expended)
-                        textView.text = "TYPE_CALORIES_EXPENDED = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+            readRequest =
+                DataReadRequest.Builder()
+                    .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
+                    .bucketByActivityType(1, TimeUnit.HOURS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { dataReadResult ->
+                    if (dataReadResult.buckets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+                        for (bucket in dataReadResult.buckets) {
+                            bucket.dataSets.forEach { dataSet ->
+                                if(dataSet.isEmpty) {
+                                    Log.i(TAG, "Dataset is empty")
+                                    val textView: TextView = findViewById(R.id.type_calories_expended)
+                                    textView.text = "TYPE_CALORIES_EXPENDED = 0"
+                                } else {
+                                    for (dp in dataSet.dataPoints) {
+                                        Log.i(TAG, "Data point:")
+                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                        for (field in dp.dataType.fields) {
+                                            Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                            val textView: TextView = findViewById(R.id.type_calories_expended)
+                                            textView.text = "TYPE_CALORIES_EXPENDED = ${dp.getValue(field)}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+                        dataReadResult.dataSets.forEach { dataSet ->
+                            if(dataSet.isEmpty) {
+                                Log.i(TAG, "Dataset is empty")
                                 val textView: TextView = findViewById(R.id.type_calories_expended)
-                                textView.text = "TYPE_CALORIES_EXPENDED = ${dp.getValue(field)}"
+                                textView.text = "TYPE_CALORIES_EXPENDED = 0"
+                            } else {
+                                for (dp in dataSet.dataPoints) {
+                                    Log.i(TAG, "Data point:")
+                                    Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                    Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                    Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                    for (field in dp.dataType.fields) {
+                                        Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                        val textView: TextView = findViewById(R.id.type_calories_expended)
+                                        textView.text = "TYPE_CALORIES_EXPENDED = ${dp.getValue(field)}"
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
 
-        // TYPE_CYCLING_PEDALING_CADENCE
+            // TYPE_CYCLING_PEDALING_CADENCE
 
-        readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_CYCLING_PEDALING_CADENCE)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_cycling_pedaling_cadence)
-                        textView.text = "TYPE_CYCLING_PEDALING_CADENCE = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_cycling_pedaling_cadence)
-                                textView.text = "TYPE_CYCLING_PEDALING_CADENCE = ${dp.getValue(field)}"
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_CYCLING_PEDALING_CADENCE)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_cycling_pedaling_cadence)
+                            textView.text = "TYPE_CYCLING_PEDALING_CADENCE = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_cycling_pedaling_cadence)
+                                    textView.text = "TYPE_CYCLING_PEDALING_CADENCE = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
 
-        // TYPE_CYCLING_PEDALING_CUMULATIVE
+            // TYPE_CYCLING_PEDALING_CUMULATIVE
 
-        readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
-                        textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
-                                textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = ${dp.getValue(field)}"
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_CYCLING_PEDALING_CUMULATIVE)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
+                            textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_cycling_pedaling_cumulative)
+                                    textView.text = "TYPE_CYCLING_PEDALING_CUMULATIVE = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
-
-        // TYPE_HEART_POINTS
-
-        Fitness.getHistoryClient(this, getGoogleAccount())
-            .readDailyTotal(DataType.TYPE_HEART_POINTS)
-            .addOnSuccessListener { dataSet ->
-                val total = when {
-                    dataSet.isEmpty -> 0
-                    else -> DataType.AGGREGATE_HEART_POINTS.toString()
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
-                Log.i(TAG, "Heart Points: $total")
-                val textView: TextView = findViewById(R.id.type_heart_points)
-                textView.text = "TYPE_HEART_POINTS = ${total}"
 
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "There was a problem getting the step count.", e)
-            }
+            // TYPE_HEART_POINTS
 
-        // TYPE_MOVE_MINUTES
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .readDailyTotal(DataType.TYPE_HEART_POINTS)
+                .addOnSuccessListener { dataSet ->
+                    val total = when {
+                        dataSet.isEmpty -> 0
+                        else -> DataType.AGGREGATE_HEART_POINTS.toString()
+                    }
+                    Log.i(TAG, "Heart Points: $total")
+                    val textView: TextView = findViewById(R.id.type_heart_points)
+                    textView.text = "TYPE_HEART_POINTS = ${total}"
 
-        readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_MOVE_MINUTES)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_move_minutes)
-                        textView.text = "TYPE_MOVE_MINUTES = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_move_minutes)
-                                textView.text = "TYPE_MOVE_MINUTES = ${dp.getValue(field)}"
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was a problem getting the step count.", e)
+                }
+
+            // TYPE_MOVE_MINUTES
+
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_MOVE_MINUTES)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_move_minutes)
+                            textView.text = "TYPE_MOVE_MINUTES = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_move_minutes)
+                                    textView.text = "TYPE_MOVE_MINUTES = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
 
-        // TYPE_STEP_COUNT_CADENCE
+            // TYPE_STEP_COUNT_CADENCE
 
-        readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_STEP_COUNT_CADENCE)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_step_count_cadence)
-                        textView.text = "TYPE_STEP_COUNT_CADENCE = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_step_count_cadence)
-                                textView.text = "TYPE_STEP_COUNT_CADENCE = ${dp.getValue(field)}"
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_STEP_COUNT_CADENCE)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_step_count_cadence)
+                            textView.text = "TYPE_STEP_COUNT_CADENCE = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_step_count_cadence)
+                                    textView.text = "TYPE_STEP_COUNT_CADENCE = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
-
-        //TYPE_STEP_COUNT_DELTA
-
-        Fitness.getHistoryClient(this, getGoogleAccount())
-            .readDailyTotal(DataType.TYPE_STEP_COUNT_DELTA)
-            .addOnSuccessListener { dataSet ->
-                val total = when {
-                    dataSet.isEmpty -> 0
-                    else -> dataSet.dataPoints.first().getValue(Field.FIELD_STEPS).asInt()
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
-                Log.i(TAG, "Total steps: $total")
-                val textView: TextView = findViewById(R.id.type_step_count_delta)
-                textView.text= "TYPE_STEP_COUNT_DELTA = $total"
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "There was a problem getting the step count.", e)
-            }
 
-        // TYPE_BODY_FAT_PERCENTAGE
+            //TYPE_STEP_COUNT_DELTA
 
-        readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.type_body_fat_percentage)
-                        textView.text = "TYPE_BODY_FAT_PERCENTAGE = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.type_body_fat_percentage)
-                                textView.text = "TYPE_BODY_FAT_PERCENTAGE = ${dp.getValue(field)}"
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .readDailyTotal(DataType.TYPE_STEP_COUNT_DELTA)
+                .addOnSuccessListener { dataSet ->
+                    val total = when {
+                        dataSet.isEmpty -> 0
+                        else -> dataSet.dataPoints.first().getValue(Field.FIELD_STEPS).asInt()
+                    }
+                    Log.i(TAG, "Total steps: $total")
+                    val textView: TextView = findViewById(R.id.type_step_count_delta)
+                    textView.text= "TYPE_STEP_COUNT_DELTA = $total"
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was a problem getting the step count.", e)
+                }
+
+            // TYPE_BODY_FAT_PERCENTAGE
+
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                        if(dataSet.isEmpty) {
+                            Log.i(TAG, "Dataset is empty")
+                            val textView: TextView = findViewById(R.id.type_body_fat_percentage)
+                            textView.text = "TYPE_BODY_FAT_PERCENTAGE = 0"
+                        } else {
+                            for (dp in dataSet.dataPoints) {
+                                Log.i(TAG, "Data point:")
+                                Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                for (field in dp.dataType.fields) {
+                                    Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    val textView: TextView = findViewById(R.id.type_body_fat_percentage)
+                                    textView.text = "TYPE_BODY_FAT_PERCENTAGE = ${dp.getValue(field)}"
+                                }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
 
-        // TYPE_WEIGHT
+            // TYPE_WEIGHT
 
-        val calendar = Calendar.getInstance()
-        readRequest =
-            DataReadRequest.Builder()
-                .read(DataType.TYPE_WEIGHT)
-                .setTimeRange(1, calendar.timeInMillis, TimeUnit.MILLISECONDS)
-                .setLimit(1)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { dataReadResult ->
-                if (dataReadResult.buckets.isNotEmpty()) {
-                    Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
-                    for (bucket in dataReadResult.buckets) {
-                        bucket.dataSets.forEach { dataSet ->
+            val calendar = Calendar.getInstance()
+            readRequest =
+                DataReadRequest.Builder()
+                    .read(DataType.TYPE_WEIGHT)
+                    .setTimeRange(1, calendar.timeInMillis, TimeUnit.MILLISECONDS)
+                    .setLimit(1)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { dataReadResult ->
+                    if (dataReadResult.buckets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned buckets of DataSets is: " + dataReadResult.buckets.size)
+                        for (bucket in dataReadResult.buckets) {
+                            bucket.dataSets.forEach { dataSet ->
+                                if(dataSet.isEmpty) {
+                                    Log.i(TAG, "Dataset is empty")
+                                    val textView: TextView = findViewById(R.id.type_weight)
+                                    textView.text = "TYPE_WEIGHT = 0"
+                                } else {
+                                    for (dp in dataSet.dataPoints) {
+                                        Log.i(TAG, "Data point:")
+                                        Log.i(TAG, "\tType: ${dp.dataType.name}")
+                                        Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
+                                        Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
+                                        for (field in dp.dataType.fields) {
+                                            Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                            val textView: TextView = findViewById(R.id.type_weight)
+                                            textView.text = "TYPE_WEIGHT = ${dp.getValue(field)}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dataReadResult.dataSets.isNotEmpty()) {
+                        Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
+                        dataReadResult.dataSets.forEach { dataSet ->
                             if(dataSet.isEmpty) {
                                 Log.i(TAG, "Dataset is empty")
                                 val textView: TextView = findViewById(R.id.type_weight)
@@ -499,13 +557,27 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-                } else if (dataReadResult.dataSets.isNotEmpty()) {
-                    Log.i(TAG, "Number of returned DataSets is: " + dataReadResult.dataSets.size)
-                    dataReadResult.dataSets.forEach { dataSet ->
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
+                }
+
+            // AGGREGATE_CALORIES_EXPENDED
+
+            readRequest =
+                DataReadRequest.Builder()
+                    .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
+                    .bucketByActivityType(1, TimeUnit.HOURS)
+                    .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+            Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+                .readData(readRequest)
+                .addOnSuccessListener { response ->
+                    for (dataSet in response.buckets.flatMap { it.dataSets }) {
                         if(dataSet.isEmpty) {
                             Log.i(TAG, "Dataset is empty")
-                            val textView: TextView = findViewById(R.id.type_weight)
-                            textView.text = "TYPE_WEIGHT = 0"
+                            val textView: TextView = findViewById(R.id.aggregate_calories_expended)
+                            textView.text = "AGGREGATE_CALORIES_EXPENDED = 0"
                         } else {
                             for (dp in dataSet.dataPoints) {
                                 Log.i(TAG, "Data point:")
@@ -514,53 +586,17 @@ class MainActivity : AppCompatActivity() {
                                 Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
                                 for (field in dp.dataType.fields) {
                                     Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    val textView: TextView = findViewById(R.id.type_weight)
-                                    textView.text = "TYPE_WEIGHT = ${dp.getValue(field)}"
+                                    val textView: TextView = findViewById(R.id.aggregate_calories_expended)
+                                    textView.text = "AGGREGATE_CALORIES_EXPENDED = ${dp.getValue(field)}"
                                 }
                             }
                         }
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
-
-        // AGGREGATE_CALORIES_EXPENDED
-
-        readRequest =
-            DataReadRequest.Builder()
-                .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
-                .bucketByActivityType(1, TimeUnit.HOURS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
-                .build()
-        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
-            .readData(readRequest)
-            .addOnSuccessListener { response ->
-                for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                    if(dataSet.isEmpty) {
-                        Log.i(TAG, "Dataset is empty")
-                        val textView: TextView = findViewById(R.id.aggregate_calories_expended)
-                        textView.text = "AGGREGATE_CALORIES_EXPENDED = 0"
-                    } else {
-                        for (dp in dataSet.dataPoints) {
-                            Log.i(TAG, "Data point:")
-                            Log.i(TAG, "\tType: ${dp.dataType.name}")
-                            Log.i(TAG, "\tStart: ${dp.getStartTimeString()}")
-                            Log.i(TAG, "\tEnd: ${dp.getEndTimeString()}")
-                            for (field in dp.dataType.fields) {
-                                Log.i(TAG, "\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                val textView: TextView = findViewById(R.id.aggregate_calories_expended)
-                                textView.text = "AGGREGATE_CALORIES_EXPENDED = ${dp.getValue(field)}"
-                            }
-                        }
-                    }
+                .addOnFailureListener { e ->
+                    Log.w(TAG,"There was an error reading data from Google Fit", e)
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG,"There was an error reading data from Google Fit", e)
-            }
-    }
+        }
 
 //    private fun dumpDataSet(dataSet: DataSet) {
 //        Log.i(TAG, "Data returned for Data type: ${dataSet.dataType.name}")
@@ -578,38 +614,232 @@ class MainActivity : AppCompatActivity() {
 //        }
 //    }
 
-    private fun DataPoint.getStartTimeString() = Instant.ofEpochSecond(this.getStartTime(TimeUnit.SECONDS))
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime().toString()
+        private fun DataPoint.getStartTimeString() = Instant.ofEpochSecond(this.getStartTime(TimeUnit.SECONDS))
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime().toString()
 
-    private fun DataPoint.getEndTimeString() = Instant.ofEpochSecond(this.getEndTime(TimeUnit.SECONDS))
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime().toString()
+        private fun DataPoint.getEndTimeString() = Instant.ofEpochSecond(this.getEndTime(TimeUnit.SECONDS))
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime().toString()
 
-    private fun permissionApproved(): Boolean {
-        return if (runningQOrLater) {
-            PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            )
-        } else {
-            true
+        private fun permissionApproved(): Boolean {
+            return if (runningQOrLater) {
+                PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                )
+            } else {
+                true
+            }
         }
+
+        // INSERT DATA
+
+        private fun insertData() {
+            var endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
+            var startTime = endTime.minusHours(1)
+
+            // Create a data source
+            val dataSource = DataSource.Builder()
+                .setAppPackageName(this)
+                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .setStreamName("$TAG - step count")
+                .setType(DataSource.TYPE_RAW)
+                .build()
+
+            // For each data point, specify a start time, end time, and the
+            // data value -- in this case, 950 new steps.
+            val stepCountDelta = 950
+            val dataPoint =
+                DataPoint.builder(dataSource)
+                    .setField(Field.FIELD_STEPS, stepCountDelta)
+                    .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                    .build()
+
+            val dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build()
+
+            Fitness.getHistoryClient(this, getGoogleAccount())
+                .insertData(dataSet)
+                .addOnSuccessListener {
+                    Log.i(TAG, "DataSet added successfully!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "There was an error adding the DataSet", e)
+                }
+        }
+
+    // UPDATE_DATA
+
+    private fun updateData() {
+        val endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
+        val startTime = endTime.minusDays(1)
+
+        // Create a data source
+        val dataSource  = DataSource.Builder()
+            .setAppPackageName(this)
+            .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+            .setStreamName("$TAG - step count")
+            .setType(DataSource.TYPE_RAW)
+            .build()
+
+        // Create a data set
+        // For each data point, specify a start time, end time, and the
+        // data value -- in this case, 1000 new steps.
+        val stepCountDelta = 1800
+
+        val dataPoint = DataPoint.builder(dataSource)
+            .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+            .setField(Field.FIELD_STEPS, stepCountDelta)
+            .build()
+
+        val dataSet = DataSet.builder(dataSource)
+            .add(dataPoint)
+            .build()
+
+        val request = DataUpdateRequest.Builder()
+            .setDataSet(dataSet)
+            .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+            .build()
+
+        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+            .updateData(request)
+            .addOnSuccessListener {
+                Log.i(TAG, "DataSet updated successfully!")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "There was an error updating the DataSet", e)
+            }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the main; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
+    private fun deleteData(){
+        // Declare that this code deletes step count information that was collected
+// throughout the past day.
+        val endTime = LocalDateTime.now().atZone(ZoneId.systemDefault())
+        val startTime = endTime.minusDays(1)
+
+// Create a delete request object, providing a data type and a time interval
+        val request = DataDeleteRequest.Builder()
+            .setTimeInterval(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+            .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
+            .build()
+
+// Invoke the History API with the HistoryClient object and delete request, and
+// then specify a callback that will check the result.
+        Fitness.getHistoryClient(this, GoogleSignIn.getAccountForExtension(this, fitnessOptions))
+            .deleteData(request)
+            .addOnSuccessListener {
+                Log.i(TAG, "Data deleted successfully!")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "There was an error with the deletion request", e)
+            }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_read_data) {
-            fitSignIn(FitActionRequestCode.READ_DATA)
+
+        override fun onCreateOptionsMenu(menu: Menu): Boolean {
+            // Inflate the main; this adds items to the action bar if it is present.
+            menuInflater.inflate(R.menu.main, menu)
             return true
         }
-        return super.onOptionsItemSelected(item)
-    }
 
-}
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+            val id = item.itemId
+            if (id == R.id.action_read_data) {
+                fitSignIn(FitActionRequestCode.READ_DATA)
+                return true
+            } else if (id == R.id.action_insert_data) {
+                fitSignIn(FitActionRequestCode.INSERT_DATA)
+                return true
+            } else if (id == R.id.action_update_data) {
+                fitSignIn(FitActionRequestCode.UPDATE_DATA)
+                return  true
+            } else if (id == R.id.action_delete_data) {
+                fitSignIn(FitActionRequestCode.DELETE_DATA)
+                return true
+            }
+            return super.onOptionsItemSelected(item)
+        }
+
+        private fun requestRuntimePermissions(requestCode: FitActionRequestCode) {
+            val shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)
+
+            // Provide an additional rationale to the user. This would happen if the user denied the
+            // request previously, but didn't check the "Don't ask again" checkbox.
+            requestCode.let {
+                if (shouldProvideRationale) {
+                    Log.i(TAG, "Displaying permission rationale to provide additional context.")
+                    Snackbar.make(
+                        findViewById(R.id.main_activity_view),
+                        R.string.permission_rationale,
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.ok) {
+                            // Request permission
+                            ActivityCompat.requestPermissions(this,
+                                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                                requestCode.ordinal)
+                        }
+                        .show()
+                } else {
+                    Log.i(TAG, "Requesting permission")
+                    // Request permission. It's possible this can be auto answered if device policy
+                    // sets the permission in a given state or the user denied the permission
+                    // previously and checked "Never ask again".
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                        requestCode.ordinal)
+                }
+            }
+        }
+
+        override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                                grantResults: IntArray) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            when {
+                grantResults.isEmpty() -> {
+                    // If user interaction was interrupted, the permission request
+                    // is cancelled and you receive empty arrays.
+                    Log.i(TAG, "User interaction was cancelled.")
+                }
+                grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission was granted.
+                    val fitActionRequestCode = FitActionRequestCode.values()[requestCode]
+                    fitActionRequestCode.let {
+                        fitSignIn(fitActionRequestCode)
+                    }
+                }
+                else -> {
+                    // Permission denied.
+
+                    // In this Activity we've chosen to notify the user that they
+                    // have rejected a core permission for the app since it makes the Activity useless.
+                    // We're communicating this message in a Snackbar since this is a sample app, but
+                    // core permissions would typically be best requested during a welcome-screen flow.
+
+                    // Additionally, it is important to remember that a permission might have been
+                    // rejected without asking the user for permission (device policy or "Never ask
+                    // again" prompts). Therefore, a user interface affordance is typically implemented
+                    // when permissions are denied. Otherwise, your app could appear unresponsive to
+                    // touches or interactions which have required permissions.
+
+                    Snackbar.make(
+                        findViewById(R.id.main_activity_view),
+                        R.string.permission_denied_explanation,
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.settings) {
+                            // Build intent that displays the App settings screen.
+                            val intent = Intent()
+                            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                            val uri = Uri.fromParts("package",
+                                BuildConfig.APPLICATION_ID, null)
+                            intent.data = uri
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        .show()
+                }
+            }
+        }
+    }
