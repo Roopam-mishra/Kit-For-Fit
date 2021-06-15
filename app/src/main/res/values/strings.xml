@@ -7,7 +7,7 @@
     <string name="permission_rationale">Location data is used as part of the Google Fit API</string>
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
-    <string name="read_step_data">Read step data</string>
+    <string name="read_data">Read Data</string>
     <string name="type_activity_segment">TYPE_ACTIVITY_SEGMENT = ?</string>
     <string name="type_basal_metabolic_rate">TYPE_BASAL_METABOLIC_RATE = ?</string>
     <string name="type_calories_expended">TYPE_CALORIES_EXPENDED = ?</string>
@@ -26,4 +26,6 @@
     <string name="type_hydration">TYPE_HYDRATION = ?</string>
     <string name="type_sleep_segment">TYPE_SLEEP_SEGMENT = ?</string>
     <string name="type_heart_rate_bpm">TYPE_HEART_RATE_BPM = ?</string>
+    <string name="last_week_total_steps">Total no. of steps of this week</string>
+    <string name="steps">Steps</string>
 </resources>
