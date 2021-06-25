@@ -42,10 +42,10 @@ class MainActivity2: AppCompatActivity() {
         binding.mainViewModel = mainViewModel
         binding.lifecycleOwner = this
         mainViewModel.fitnessData.observe(this, Observer {
-            binding.textView1.text = it.name.toString()
-            binding.textView2.text = it.stepsCount.toString()
-            binding.textView3.text = it.weekDescription.toString()
-            binding.textView4.text = it.weekStepsCount.toString()
+            binding.textView1.text = it.name
+            binding.textView2.text = it.dailyCount
+            binding.textView3.text = it.weekDescription
+            binding.textView4.text = it.weekCount
         })
     }
 
@@ -87,5 +87,25 @@ class MainActivity2: AppCompatActivity() {
 
     fun getStepsData(view: View) {
         mainViewModel.getStepsData(this)
+    }
+
+    fun getCaloriesData(view: View) {
+        mainViewModel.getCaloriesData(this)
+    }
+
+    fun getDistanceData(view: View) {
+        mainViewModel.getDistanceData(this)
+    }
+
+    fun getMinutesData(view: View) {
+        mainViewModel.getMinutesData(this)
+    }
+
+    fun getHeartPointsData(view: View) {
+        mainViewModel.getHeartPointsData(this)
+    }
+
+    fun getWeightData(view: View) {
+        mainViewModel.getWeightData(this)
     }
 }

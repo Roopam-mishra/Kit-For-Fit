@@ -1,8 +1,8 @@
 package com.example.kitforfit
 
-class FitnessData {
-    var name: String? = null
-    var stepsCount: Int? = null
-    var weekDescription: String? = null
-    var weekStepsCount: Int? = null
+class FitnessData(name: String, dailyCount: String, weekDescription: String, weekCount: String) {
+    var name: String = name
+    var dailyCount: String = dailyCount
+    var weekDescription: String = weekDescription
+    var weekCount: String = weekCount
 }

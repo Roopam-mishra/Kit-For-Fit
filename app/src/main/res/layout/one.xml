@@ -38,6 +38,7 @@
                 android:backgroundTint="@color/red" />
 
             <Button
+                android:onClick="getCaloriesData"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Calories"
@@ -48,6 +49,7 @@
                 android:backgroundTint="@color/red" />
 
             <Button
+                android:onClick="getDistanceData"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Distance"
@@ -67,6 +69,7 @@
             android:orientation="horizontal">
 
             <Button
+                android:onClick="getMinutesData"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -77,6 +80,7 @@
                 android:backgroundTint="@color/red" />
 
             <Button
+                android:onClick="getHeartPointsData"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Heart Pts"
@@ -87,6 +91,7 @@
                 android:backgroundTint="@color/red" />
 
             <Button
+                android:onClick="getWeightData"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Weight"
