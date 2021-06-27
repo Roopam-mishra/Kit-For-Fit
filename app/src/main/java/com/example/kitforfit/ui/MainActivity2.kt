@@ -1,20 +1,21 @@
-package com.example.kitforfit
+package com.example.kitforfit.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.kitforfit.R
 import com.example.kitforfit.databinding.OneBinding
+import com.example.kitforfit.presentation.MainViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
-
+const val TAG = "KitForFit"
 class MainActivity2: AppCompatActivity() {
 
     private val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1
@@ -47,6 +48,29 @@ class MainActivity2: AppCompatActivity() {
             binding.textView3.text = it.weekDescription
             binding.textView4.text = it.weekCount
         })
+
+        binding.button1.setOnClickListener {
+            getData(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+        }
+        binding.button2.setOnClickListener {
+            getData(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+        }
+        binding.button3.setOnClickListener {
+            getData(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+        }
+        binding.button4.setOnClickListener {
+            getData(DataType.TYPE_MOVE_MINUTES, DataType.AGGREGATE_MOVE_MINUTES)
+        }
+        binding.button5.setOnClickListener {
+            getData(DataType.TYPE_HEART_POINTS, DataType.AGGREGATE_HEART_POINTS)
+        }
+        binding.button6.setOnClickListener {
+            getData(DataType.TYPE_WEIGHT, DataType.AGGREGATE_WEIGHT_SUMMARY)
+        }
+    }
+
+    private fun getData(dataType1: DataType, dataType2: DataType) {
+        mainViewModel.getData(dataType1, dataType2, this)
     }
 
     private val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
@@ -84,28 +108,4 @@ class MainActivity2: AppCompatActivity() {
 
     private fun oAuthPermissionsApproved() = GoogleSignIn.hasPermissions(getGoogleAccount(), fitnessOptions)
     private fun getGoogleAccount() = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
-
-    fun getStepsData(view: View) {
-        mainViewModel.getStepsData(this)
-    }
-
-    fun getCaloriesData(view: View) {
-        mainViewModel.getCaloriesData(this)
-    }
-
-    fun getDistanceData(view: View) {
-        mainViewModel.getDistanceData(this)
-    }
-
-    fun getMinutesData(view: View) {
-        mainViewModel.getMinutesData(this)
-    }
-
-    fun getHeartPointsData(view: View) {
-        mainViewModel.getHeartPointsData(this)
-    }
-
-    fun getWeightData(view: View) {
-        mainViewModel.getWeightData(this)
-    }
 }

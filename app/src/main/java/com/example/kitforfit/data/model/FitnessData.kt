@@ -1,4 +1,4 @@
-package com.example.kitforfit
+package com.example.kitforfit.data.model
 
 class FitnessData(name: String, dailyCount: String, weekDescription: String, weekCount: String) {
     var name: String = name
