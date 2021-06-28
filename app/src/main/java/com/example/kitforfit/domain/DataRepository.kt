@@ -21,9 +21,13 @@ class DataRepository {
     var fitnessData = MutableLiveData<FitnessData>()
 
     fun getData(dataType1: DataType, dataType2: DataType, context: Context) {
-        val name = dataType1.name.toString().split(".")[2].capitalize()
+        val name = dataType1.name.toString().split(".")[2].replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(
+                Locale.getDefault()
+            ) else it.toString()
+        }
         Log.i(TAG,name)
-        var data = FitnessData(name, "Not able to find", "Total no. of $name this week", "Not able to find")
+        val data = FitnessData(name, "Not able to find", "Total no. of $name this week", "Not able to find")
         val fitnessOptions: FitnessOptions by lazy {
             FitnessOptions.builder()
                 .addDataType(dataType1, FitnessOptions.ACCESS_WRITE)
@@ -85,6 +89,4 @@ class DataRepository {
                 Log.w(TAG,"There was an error reading data from Google Fit", e)
             }
     }
-
-
 }

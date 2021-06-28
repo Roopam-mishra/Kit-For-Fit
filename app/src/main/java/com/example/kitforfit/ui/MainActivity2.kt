@@ -1,13 +1,13 @@
 package com.example.kitforfit.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.kitforfit.R
 import com.example.kitforfit.databinding.OneBinding
@@ -29,8 +29,9 @@ class MainActivity2: AppCompatActivity() {
     }
 
     private lateinit var mainViewModel: MainViewModel
-    lateinit var binding : OneBinding
+    private lateinit var binding : OneBinding
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -42,7 +43,7 @@ class MainActivity2: AppCompatActivity() {
         checkPermissionsAndRun()
         binding.mainViewModel = mainViewModel
         binding.lifecycleOwner = this
-        mainViewModel.fitnessData.observe(this, Observer {
+        mainViewModel.fitnessData.observe(this, {
             binding.textView1.text = it.name
             binding.textView2.text = it.dailyCount
             binding.textView3.text = it.weekDescription
@@ -102,7 +103,7 @@ class MainActivity2: AppCompatActivity() {
                 this,
                 GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
                 getGoogleAccount(),
-                fitnessOptions);
+                fitnessOptions)
         }
     }
 
