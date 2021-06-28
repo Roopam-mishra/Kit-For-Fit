@@ -76,15 +76,16 @@ class DataRepository {
                 if(dataType1 == DataType.TYPE_WEIGHT){
                     if(count == 0){
                         data.weekCount = "Not found any weight details"
-
                     } else {
                         data.weekCount = (x/count).toString()
                     }
                     data.weekDescription = "Your average weight this week."
                 } else if(dataType1 == DataType.TYPE_CALORIES_EXPENDED){
                     data.weekDescription = "Total calories expended this week."
+                    data.weekCount = x.toString()
                 } else if(dataType1 == DataType.TYPE_DISTANCE_DELTA) {
                     data.weekDescription = "Total Distance travelled this week."
+                    data.weekCount = x.toString()
                 } else {
                     data.weekCount = x.toString()
                 }
