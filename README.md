@@ -16,7 +16,7 @@ This app tracks your today's data and the past week data of the following parame
 
 MAIN SCREEN
 |:-:|
-<img src="Screenshots/photo_1.jpeg" width="31%" height="580" />
+<img src="Screenshots/photo_1.jpeg" width="32%" height="560" />
 
 | Steps Count | Calories Expended |  Distance Covered |
 |:-:|:-:|:-:|
