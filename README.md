@@ -14,9 +14,6 @@ This app tracks your today's data and the past week data of the following parame
 6. Weight
 
 
-MAIN SCREEN
-|:-:|
-<img src="Screenshots/photo_1.jpeg" width="32%" height="560" />
 
 | Main Screen | Steps Count | Calories Expended |  Distance Covered |
 |:-:|:-:|:-:|:-:|
