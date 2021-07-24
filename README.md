@@ -18,9 +18,9 @@ MAIN SCREEN
 |:-:|
 <img src="Screenshots/photo_1.jpeg" width="32%" height="560" />
 
-| Steps Count | Calories Expended |  Distance Covered |
-|:-:|:-:|:-:|
-| ![Steps Count](Screenshots/photo_2.jpeg) | ![Calories Expended](Screenshots/photo_3.jpeg) | ![Distance Covered](Screenshots/photo_4.jpeg) |
+| Main Screen | Steps Count | Calories Expended |  Distance Covered |
+|:-:|:-:|:-:|:-:|
+| ![Main Screen](Screenshots/photo_1.jpeg) | ![Steps Count](Screenshots/photo_2.jpeg) | ![Calories Expended](Screenshots/photo_3.jpeg) | ![Distance Covered](Screenshots/photo_4.jpeg) |
 
 | Move Minutes | Heart Points |  Weight |
 |:-:|:-:|:-:|
